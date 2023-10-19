@@ -59,6 +59,7 @@ export const KEYWORDS = [
 export const REGEX = {
   ALPHABETIC: /^[a-zA-Z_$]+$/,
   NUMBERIC: /^[0-9]+$/,
+  ALPHABETIC_THEN_ALPHANUMERIC: /^[a-zA-Z_$][a-zA-Z_\$0-9]*/,
 };
 
 export const TOKEN_TYPES = {

@@ -1,71 +1,19 @@
-import { END_OF_LINE, END_OF_WORD, KEYWORDS, PUNCTUATIONS, REGEX, TOKEN_TYPES } from './lexer.contants.js';
+# Atividade Compiladores
 
-function* enumerate(iterable) {
-  let i = 0;
+Ana Carolina Maia Atala ana.atala@unemat.br
 
-  for (const x of iterable) {
-    yield [i, x];
-    i++;
-  }
-}
+## Funcionamento
 
-function analyzeToken(currentLexer, endColumn) {
-  const tokenBuilder = (type) => ({
-    text: currentLexer.text,
-    type,
-    loc: {
-      line: currentLexer.startLine,
-      startColumn: currentLexer.startCol,
-      endColumn: endColumn + 1,
-    },
-  });
+O Analisador quebra um arquivo em linhas
+para cada linha, ele roda uma subrotina que vai varrendo a string ate encontrar condicoes de parada.
+A cada condição de parada, ele analisa a string ja armazenada, e começa uma nova analise,
+A subrotina termina no fim da linha.
 
-  if (
-    currentLexer.text == undefined ||
-    currentLexer.text === '' ||
-    END_OF_WORD.includes(currentLexer.text) ||
-    END_OF_LINE.includes(currentLexer.text)
-  ) {
-    return null;
-  }
+Posteriormente, um Array que guardava todas as subrotinas é exibido em uma tabela
 
-  if (KEYWORDS.includes(currentLexer.text)) {
-    return tokenBuilder(TOKEN_TYPES.RESERVED);
-  }
+### O analisador de condicao de parada
 
-  if (PUNCTUATIONS.includes(currentLexer.text)) {
-    return tokenBuilder(TOKEN_TYPES.PUNCTUATION);
-  }
-
-  if (REGEX.NUMBERIC.test(currentLexer.text)) {
-    return tokenBuilder(TOKEN_TYPES.NUMBER);
-  }
-
-  if (REGEX.ALPHABETIC_THEN_ALPHANUMERIC.test(currentLexer.text)) {
-    return tokenBuilder(TOKEN_TYPES.IDENTIFIER);
-  }
-
-  return tokenBuilder(TOKEN_TYPES.INVALID_TOKEN);
-}
-
-class Lexeme {
-  constructor(text = '', state = LEXER_STATES.START, startLine, startCol) {
-    this.text = text;
-    this.state = state;
-    this.startLine = startLine;
-    this.startCol = startCol;
-  }
-}
-
-const cleanCurentLexeme = (startLine, startCol) => new Lexeme(undefined, undefined, startLine, startCol);
-
-const LEXER_STATES = {
-  START: 'START',
-  WORD_ITERATION: 'WORD',
-  NUMBER_ITERATION: 'NUMBER',
-  FINAL: 'FINAL',
-};
-
+```js
 export function lineLexer(input, currentLine) {
   if (typeof input !== 'string') {
     throw new Error('Input must be a string');
@@ -91,7 +39,7 @@ export function lineLexer(input, currentLine) {
       //analyze previous token since a punctuation was found
       tokens.push(analyzeToken(currentLexeme, index - 1));
 
-      //add punctiation as <toke></toke>n
+      //add punctiation as token
       currentLexeme = new Lexeme(character, LEXER_STATES.WORD_ITERATION, currentLine, index);
       tokens.push(analyzeToken(currentLexeme, index));
 
@@ -148,3 +96,47 @@ export function lineLexer(input, currentLine) {
 
   return tokens.filter(Boolean);
 }
+```
+
+### O analisador de cada token
+
+```js
+function analyzeToken(currentLexer, endColumn) {
+  const tokenBuilder = (type) => ({
+    text: currentLexer.text,
+    type,
+    loc: {
+      line: currentLexer.startLine,
+      startColumn: currentLexer.startCol,
+      endColumn: endColumn + 1,
+    },
+  });
+
+  if (
+    currentLexer.text == undefined ||
+    currentLexer.text === '' ||
+    END_OF_WORD.includes(currentLexer.text) ||
+    END_OF_LINE.includes(currentLexer.text)
+  ) {
+    return null;
+  }
+
+  if (KEYWORDS.includes(currentLexer.text)) {
+    return tokenBuilder(TOKEN_TYPES.RESERVED);
+  }
+
+  if (PUNCTUATIONS.includes(currentLexer.text)) {
+    return tokenBuilder(TOKEN_TYPES.PUNCTUATION);
+  }
+
+  if (REGEX.NUMBERIC.test(currentLexer.text)) {
+    return tokenBuilder(TOKEN_TYPES.NUMBER);
+  }
+
+  if (REGEX.ALPHABETIC.test(currentLexer.text)) {
+    return tokenBuilder(TOKEN_TYPES.IDENTIFIER);
+  }
+
+  return tokenBuilder(TOKEN_TYPES.INVALID_TOKEN);
+}
+```
