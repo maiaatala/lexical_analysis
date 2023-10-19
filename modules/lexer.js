@@ -119,7 +119,7 @@ export function lineLexer(input, currentLine) {
       if (REGEX.NUMBERIC.test(character)) {
         currentLexeme = new Lexeme(character, LEXER_STATES.NUMBER_ITERATION, currentLine, index);
       }
-      //check if valid character
+
       currentLexeme = new Lexeme(character, LEXER_STATES.WORD_ITERATION, currentLine, index);
       continue;
     }
