@@ -39,7 +39,7 @@ export function lineLexer(input, currentLine) {
       //analyze previous token since a punctuation was found
       tokens.push(analyzeToken(currentLexeme, index - 1));
 
-      //add punctiation as token
+      //add punctiation as <toke></toke>n
       currentLexeme = new Lexeme(character, LEXER_STATES.WORD_ITERATION, currentLine, index);
       tokens.push(analyzeToken(currentLexeme, index));
 
@@ -67,7 +67,7 @@ export function lineLexer(input, currentLine) {
       if (REGEX.NUMBERIC.test(character)) {
         currentLexeme = new Lexeme(character, LEXER_STATES.NUMBER_ITERATION, currentLine, index);
       }
-      //check if valid character
+
       currentLexeme = new Lexeme(character, LEXER_STATES.WORD_ITERATION, currentLine, index);
       continue;
     }
@@ -133,7 +133,7 @@ function analyzeToken(currentLexer, endColumn) {
     return tokenBuilder(TOKEN_TYPES.NUMBER);
   }
 
-  if (REGEX.ALPHABETIC.test(currentLexer.text)) {
+  if (REGEX.ALPHABETIC_THEN_ALPHANUMERIC.test(currentLexer.text)) {
     return tokenBuilder(TOKEN_TYPES.IDENTIFIER);
   }
 
